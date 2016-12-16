@@ -1,9 +1,10 @@
 import { combineReducers } from 'redux'
 import locationReducer from './location'
-
+import weatherReducer from './weather'
 export const makeRootReducer = (asyncReducers) => {
   return combineReducers({
     location: locationReducer,
+    weather: weatherReducer,
     ...asyncReducers
   })
 }

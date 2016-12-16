@@ -1,15 +1,15 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
 import './Chart.scss'
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend, ReferenceLine } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts'
 
 const data = [
-  { name: 'Page A', Ox: 2007, male: 106.898, female: 97.516 },
-  { name: 'Page B', Ox: 2008, male: 103.937, female: 94.796 },
-  { name: 'Page C', Ox: 2009, male: 99.492, female: 91.818 },
-  { name: 'Page D', Ox: 2010, male: 87.213, female: 79.673 },
-  { name: 'Page E', Ox: 2011, male: 101.943, female: 94.684 },
-  { name: 'Page F', Ox: 2012, male: 118.848, female: 110.633 },
-  { name: 'Page G', Ox: 2013, male: 103.120, female: 95.993 }
+  { Ox: 2007, male: 106.898, female: 97.516 },
+  { Ox: 2008, male: 103.937, female: 94.796 },
+  { Ox: 2009, male: 99.492, female: 91.818 },
+  { Ox: 2010, male: 87.213, female: 79.673 },
+  { Ox: 2011, male: 101.943, female: 94.684 },
+  { Ox: 2012, male: 118.848, female: 110.633 },
+  { Ox: 2013, male: 103.120, female: 95.993 }
 ]
 
 class Chart extends Component {
@@ -25,20 +25,27 @@ class Chart extends Component {
     return (
       <div className='someclass'>
         <LineChart
-          width={430}
-          height={330}
+          width={630}
+          height={430}
           data={data}
-          margin={{ top: 30, bottom: 10, right: 30 }}
+          margin={{ top: 30, bottom: 10, right: 40 }}
        >
-          <XAxis dataKey='Ox' interval='preserveStartEnd' name='year' />
+          <XAxis
+            dataKey='Ox'
+            interval='preserveStartEnd'
+            label='Year'
+            padding={{ right: 15 }}
+            name='year' />
           <YAxis
             type='number'
             yAxisId={0}
+            padding={{ top: 10 }}
             domain={[70, 'auto']}
             label='People'
             tickFormatter={(t) => (t === 60) ? '' : t}
           />
           <Tooltip />
+          <Legend verticalAlign='top' height={36} />
           <CartesianGrid stroke='#f5f5f5' />
           <Line
             type='monotone'
@@ -60,13 +67,6 @@ class Chart extends Component {
       </div>
     )
   }
-}
-
-Chart.propTypes = {
-  user: PropTypes.object.isRequired,
-  gotoBack: PropTypes.func.isRequired,
-  gotoHome: PropTypes.func.isRequired,
-  createFeedback: PropTypes.func.isRequired
 }
 
 export default Chart
