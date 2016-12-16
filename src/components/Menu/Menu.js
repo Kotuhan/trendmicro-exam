@@ -1,14 +1,18 @@
 import React from 'react'
-import { IndexLink, Link } from 'react-router'
+import { Link } from 'react-router'
 import './Menu.scss'
 
 export const Menu = () => (
   <div className='menu'>
-    <Link to='/chart' activeClassName='route--active'>
-      Data Analysis
+    <Link to='/dataAnalysis' activeClassName='active' className='menu-item'>
+      <div className='menu-content'>
+        Data Analysis
+      </div>
     </Link>
-    <Link to='/weather' activeClassName='route--active'>
-      Weather
+    <Link to='/weather' activeClassName='active' className='menu-item'>
+      <div className='menu-content'>
+        Today's Weather
+      </div>
     </Link>
   </div>
 )

@@ -24,7 +24,7 @@ export const doubleAsync = () => {
       setTimeout(() => {
         dispatch({
           type    : COUNTER_DOUBLE_ASYNC,
-          payload : getState().chart
+          payload : getState().dataAnalysis
         })
         resolve()
       }, 200)
@@ -49,7 +49,7 @@ const ACTION_HANDLERS = {
 // Reducer
 // ------------------------------------
 const initialState = 0
-export default function chartReducer (state = initialState, action) {
+export default function dataAnalysisReducer (state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type]
 
   return handler ? handler(state, action) : state

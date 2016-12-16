@@ -1,6 +1,28 @@
 .menu {
   display: inline-block;
   width: 20%;
+}
+
+.menu-item {
+  font-family: Arial;
+  width: 100%;
+  cursor: pointer;
+  cursor: hand;
+  border:1px solid #c0c0c0;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.menu-content {
+  width: 100%;
+  font-size: 12px;
+  padding: 5px 5px 5px 20px;
+  color: black;
+}
+
+.active {
+  font-size: 12px;
+  border-color: #2a9fcd;
+  background-color: #E7EBFF;
   font-weight: bold;
-  text-decoration: underline;
 }
