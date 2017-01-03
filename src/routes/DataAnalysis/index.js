@@ -1,5 +1,3 @@
-import { injectReducer } from '../../store/reducers'
-
 export default (store) => ({
   path : 'dataAnalysis',
   /*  Async getComponent is only invoked when route matches   */
@@ -10,11 +8,8 @@ export default (store) => ({
       /*  Webpack - use require callback to define
           dependencies for bundling   */
       const DataAnalysis = require('./containers/DataAnalysisContainer').default
-      const reducer = require('./modules/dataAnalysis').default
 
       /*  Add the reducer to the store on key 'dataAnalysis'  */
-      injectReducer(store, { key: 'dataAnalysis', reducer })
-
       /*  Return getComponent   */
       cb(null, DataAnalysis)
 

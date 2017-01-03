@@ -12,9 +12,6 @@ export const DataAnalysis = () => (
 )
 
 DataAnalysis.propTypes = {
-  dataAnalysis     : React.PropTypes.number.isRequired,
-  doubleAsync : React.PropTypes.func.isRequired,
-  increment   : React.PropTypes.func.isRequired
 }
 
 export default DataAnalysis
