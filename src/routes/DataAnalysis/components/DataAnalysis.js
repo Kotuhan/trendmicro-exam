@@ -52,7 +52,7 @@ class App extends React.Component {
                     const { id, name, loadOnDemand = false, children, state, props = {} } = node
 
                     const droppable = treeOptions.droppable
-                    const { depth, open, path, total, checked, selected = false } = state
+                    const { depth, open, checked = false } = state
                     const more = node.hasChildren()
 
                     return (
@@ -64,7 +64,6 @@ class App extends React.Component {
                         data-id={id}
                         droppable={droppable}
                       >
-
                         <div
                           className="infinite-tree-node"
                           style={{ marginLeft: depth * 18 }}
@@ -85,18 +84,26 @@ class App extends React.Component {
                     )
                   }}
                   selectable
-                  shouldSelectNode={(node) => {
-                    const recursiveUpdate = (node, isOpened) => {
-                      node.state.checked = !node.state.checked
+                  shouldSelectNode={(rootNode) => {
+                    const more = rootNode.hasChildren()
+
+                    const recursiveUpdate = (node) => {
+                      node.state.checked = rootNode.state.checked
                       const more = node.hasChildren()
                       if (more) {
                         node.children.forEach(child => {
                           recursiveUpdate(child)
                         })
                       }
-                      this.tree.updateNode(node)
                     }
-                    recursiveUpdate(node)
+
+                    rootNode.state.checked = !rootNode.state.checked
+                    if (more) {
+                      recursiveUpdate(rootNode)
+                    } else {
+                      
+                    }
+                    this.tree.updateNode(rootNode)
                     return true
                   }}
                   onClick={(event) => {
@@ -104,23 +111,22 @@ class App extends React.Component {
                   //  console.log('click:', target);
                   }}
                   onDoubleClick={(event) => {
-                    console.log('double click:', target);
+                    //console.log('double click:', target)
                   }}
                   onOpenNode={(node) => {
-                    console.log('open node:', node);
+                    console.log('open node:', node)
                   }}
                   onCloseNode={(node) => {
-                    console.log('close node:', node);
+                    console.log('close node:', node)
                   }}
                   onSelectNode={(node) => {
-                    console.log('select node:', node)
+                    // console.log('select node:', node)
                   }}
                   onClusterWillChange={() => {
                   }}
                   onClusterDidChange={() => {
                   }}
                   onContentWillUpdate={(node) => {
-                    console.log(node);
                   }}
                   onContentDidUpdate={() => {
                   }}
