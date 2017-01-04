@@ -132,7 +132,14 @@ class App extends React.Component {
 
                     const changeParentChecked = (parent) => {
                       const childrenLength = parent.children.length
-                      let checkedChildren = parent.state.checkedChildren
+                      let checkedChildren = 0
+                      parent.children.forEach((child) => {
+                        if (child.state.checked) checkedChildren++
+                      })
+
+                      console.log('parent.children', parent.children);
+                      console.log('checkedChildren', checkedChildren);
+
                       let checked
                       // console.log('checkedChildren', checkedChildren);
 
@@ -150,15 +157,7 @@ class App extends React.Component {
                     }
 
                     const recursiveParentChange = (parent, child) => {
-                      if (parent.state.checkedChildren) {
-                        parent.state.checkedChildren += child.state.checked ? 1 : -1
-                      } else {
-                        parent.state.checkedChildren = 1
-                      }
-
                       parent.state.checked = changeParentChecked(parent)
-                      parent.children.forEach((child) => console.log('child checked', child.state.checked))
-                      console.log('parent', parent.state.checkedChildren)
                       this.tree.updateNode(parent)
                       if (parent.state.depth !== 0) recursiveParentChange(parent.parent, parent)
                     }
