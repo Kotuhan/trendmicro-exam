@@ -121,20 +121,24 @@ class App extends React.Component {
                     }
 
                     if (more) {
+                      console.log('more');
                       recursiveUpdate(rootNode)
                     }
 
-                    if (rootNode.state.depth !== 0) {
-                      rootNode.parent.state.checkedChildren += rootNode.state.checked ? 1 : -1
-                      if (
-                          rootNode.parent.state.checkedChildren > 0 &&
-                          rootNode.parent.state.checkedChildren < rootNode.parent.children.length) {
-                        rootNode.parent.state.checked = 'partial'
-                        this.tree.updateNode(rootNode.parent)
+                    const changeParentState = (state, childrenLength) => {
+                      const checked = rootNode.state.checked
+                      state.checkedChildren += checked ? 1 : -1
+                      if (state.checkedChildren > 0 &&
+                          state.checkedChildren < childrenLength) {
+                        state.checked = 'partial'
                       }
                     }
 
-                    this.tree.updateNode(rootNode)
+                    if (rootNode.state.depth !== 0) {
+                      changeParentState(rootNode.parent.state, rootNode.parent.children.length)
+                    }
+
+                    this.tree.updateNode(rootNode.parent)
                     return true
                   }}
                   onClick={(event) => {
