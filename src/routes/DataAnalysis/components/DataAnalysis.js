@@ -50,7 +50,6 @@ class App extends React.Component {
                     }}
                   rowRenderer={(node, treeOptions) => {
                     const { id, loadOnDemand = false, state, props = {} } = node
-                    node.state.checkedChildren = 0
                     const droppable = treeOptions.droppable
                     const { depth, open, checked = false } = state
                     const more = node.hasChildren()
@@ -121,24 +120,38 @@ class App extends React.Component {
                     }
 
                     if (more) {
-                      console.log('more');
                       recursiveUpdate(rootNode)
                     }
 
-                    const changeParentState = (state, childrenLength) => {
-                      const checked = rootNode.state.checked
-                      state.checkedChildren += checked ? 1 : -1
-                      if (state.checkedChildren > 0 &&
-                          state.checkedChildren < childrenLength) {
-                        state.checked = 'partial'
+                    const changeParentState = (parent) => {
+                      const childrenLength = parent.children.length
+                      let checkedChildren = parent.state.checkedChildren
+                      let changeTo
+                      console.log('checkedChildren', checkedChildren);
+
+                      console.log('childrenLength', childrenLength);
+
+                      if (checkedChildren > 0 && checkedChildren < childrenLength) {
+                        changeTo = 'partial'
+                      } else if (checkedChildren === 0) {
+                        changeTo = false
+                      } else {
+                        changeTo = true
                       }
+                      return changeTo
                     }
 
                     if (rootNode.state.depth !== 0) {
-                      changeParentState(rootNode.parent.state, rootNode.parent.children.length)
+                      if (rootNode.parent.state.checkedChildren) {
+                        rootNode.parent.state.checkedChildren += rootNode.state.checked ? 1 : -1
+                      } else {
+                        rootNode.parent.state.checkedChildren = 1
+                      }
+                      rootNode.parent.state.checked = changeParentState(rootNode.parent)
+                      this.tree.updateNode(rootNode.parent)
+                    } else {
+                      this.tree.updateNode(rootNode)
                     }
-
-                    this.tree.updateNode(rootNode.parent)
                     return true
                   }}
                   onClick={(event) => {
