@@ -31,7 +31,7 @@ class App extends React.Component {
             <div>
                 <InfiniteTree
                     ref={(c) => this.tree = c.tree}
-                    autoOpen={true}
+                    autoOpen={false}
                     loadNodes={(parentNode, done) => {
                         const suffix = parentNode.id.replace(/(\w)+/, '');
                         const nodes = [
@@ -100,9 +100,14 @@ class App extends React.Component {
                     const more = rootNode.hasChildren()
 
                     const recursiveUpdate = (node) => {
-                      node.state.checked = rootNode.state.checked
                       const more = node.hasChildren()
+
+                      node.state.checked = rootNode.state.checked
                       if (more) {
+                        node.state.checkedChildren = node.state.checked
+                        ? node.children.length
+                        : 0
+
                         node.children.forEach(child => {
                           recursiveUpdate(child)
                         })
@@ -115,30 +120,32 @@ class App extends React.Component {
                         rootNode.state.checked === undefined
                         ) {
                       rootNode.state.checked = true
+                      if (more) rootNode.state.checkedChildren = rootNode.children.length - 1
                     } else {
                       rootNode.state.checked = false
+                      if (more) rootNode.state.checkedChildren = 0
                     }
 
                     if (more) {
                       recursiveUpdate(rootNode)
                     }
 
-                    const changeParentState = (parent) => {
+                    const changeParentChecked = (parent) => {
                       const childrenLength = parent.children.length
                       let checkedChildren = parent.state.checkedChildren
-                      let changeTo
+                      let checked
                       console.log('checkedChildren', checkedChildren);
 
                       console.log('childrenLength', childrenLength);
 
                       if (checkedChildren > 0 && checkedChildren < childrenLength) {
-                        changeTo = 'partial'
+                        checked = 'partial'
                       } else if (checkedChildren === 0) {
-                        changeTo = false
+                        checked = false
                       } else {
-                        changeTo = true
+                        checked = true
                       }
-                      return changeTo
+                      return checked
                     }
 
                     if (rootNode.state.depth !== 0) {
@@ -147,12 +154,12 @@ class App extends React.Component {
                       } else {
                         rootNode.parent.state.checkedChildren = 1
                       }
-                      rootNode.parent.state.checked = changeParentState(rootNode.parent)
+                      rootNode.parent.state.checked = changeParentChecked(rootNode.parent)
                       this.tree.updateNode(rootNode.parent)
                     } else {
                       this.tree.updateNode(rootNode)
                     }
-                    return true
+                    return false
                   }}
                   onClick={(event) => {
                   //  const target = event.target || event.srcElement; // IE8
@@ -174,7 +181,7 @@ class App extends React.Component {
                   }}
                   onClusterDidChange={() => {
                   }}
-                  onContentWillUpdate={(node) => {
+                  onContentWillUpdate={() => {
                   }}
                   onContentDidUpdate={() => {
                   }}
