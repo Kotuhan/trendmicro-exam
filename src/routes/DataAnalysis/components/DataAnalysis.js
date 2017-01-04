@@ -134,9 +134,9 @@ class App extends React.Component {
                       const childrenLength = parent.children.length
                       let checkedChildren = parent.state.checkedChildren
                       let checked
-                      console.log('checkedChildren', checkedChildren);
+                      // console.log('checkedChildren', checkedChildren);
 
-                      console.log('childrenLength', childrenLength);
+                      // console.log('childrenLength', childrenLength);
 
                       if (checkedChildren > 0 && checkedChildren < childrenLength) {
                         checked = 'partial'
@@ -145,17 +145,26 @@ class App extends React.Component {
                       } else {
                         checked = true
                       }
+
                       return checked
                     }
 
-                    if (rootNode.state.depth !== 0) {
-                      if (rootNode.parent.state.checkedChildren) {
-                        rootNode.parent.state.checkedChildren += rootNode.state.checked ? 1 : -1
+                    const recursiveParentChange = (parent, child) => {
+                      if (parent.state.checkedChildren) {
+                        parent.state.checkedChildren += child.state.checked ? 1 : -1
                       } else {
-                        rootNode.parent.state.checkedChildren = 1
+                        parent.state.checkedChildren = 1
                       }
-                      rootNode.parent.state.checked = changeParentChecked(rootNode.parent)
-                      this.tree.updateNode(rootNode.parent)
+
+                      parent.state.checked = changeParentChecked(parent)
+                      parent.children.forEach((child) => console.log('child checked', child.state.checked))
+                      console.log('parent', parent.state.checkedChildren)
+                      this.tree.updateNode(parent)
+                      if (parent.state.depth !== 0) recursiveParentChange(parent.parent, parent)
+                    }
+
+                    if (rootNode.state.depth !== 0) {
+                      recursiveParentChange(rootNode.parent, rootNode)
                     } else {
                       this.tree.updateNode(rootNode)
                     }
