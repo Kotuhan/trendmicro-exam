@@ -97,17 +97,15 @@ class App extends React.Component {
                   }}
                   selectable
                   shouldSelectNode={(rootNode) => {
+                    // TODO: check if any of first child is partial - set parent to partial
                     const more = rootNode.hasChildren()
 
                     const recursiveUpdate = (node) => {
                       const more = node.hasChildren()
 
                       node.state.checked = rootNode.state.checked
-                      if (more) {
-                        node.state.checkedChildren = node.state.checked
-                        ? node.children.length
-                        : 0
 
+                      if (more) {
                         node.children.forEach(child => {
                           recursiveUpdate(child)
                         })
@@ -120,10 +118,8 @@ class App extends React.Component {
                         rootNode.state.checked === undefined
                         ) {
                       rootNode.state.checked = true
-                      if (more) rootNode.state.checkedChildren = rootNode.children.length - 1
                     } else {
                       rootNode.state.checked = false
-                      if (more) rootNode.state.checkedChildren = 0
                     }
 
                     if (more) {
@@ -133,17 +129,11 @@ class App extends React.Component {
                     const changeParentChecked = (parent) => {
                       const childrenLength = parent.children.length
                       let checkedChildren = 0
+                      let checked
+
                       parent.children.forEach((child) => {
                         if (child.state.checked) checkedChildren++
                       })
-
-                      console.log('parent.children', parent.children);
-                      console.log('checkedChildren', checkedChildren);
-
-                      let checked
-                      // console.log('checkedChildren', checkedChildren);
-
-                      // console.log('childrenLength', childrenLength);
 
                       if (checkedChildren > 0 && checkedChildren < childrenLength) {
                         checked = 'partial'
@@ -158,8 +148,11 @@ class App extends React.Component {
 
                     const recursiveParentChange = (parent, child) => {
                       parent.state.checked = changeParentChecked(parent)
-                      this.tree.updateNode(parent)
-                      if (parent.state.depth !== 0) recursiveParentChange(parent.parent, parent)
+                      if (parent.state.depth !== 0) {
+                        recursiveParentChange(parent.parent, parent)
+                      } else {
+                        this.tree.updateNode(parent)
+                      }
                     }
 
                     if (rootNode.state.depth !== 0) {
@@ -170,20 +163,14 @@ class App extends React.Component {
                     return false
                   }}
                   onClick={(event) => {
-                  //  const target = event.target || event.srcElement; // IE8
-                  //  console.log('click:', target);
                   }}
                   onDoubleClick={(event) => {
-                    // console.log('double click:', target)
                   }}
                   onOpenNode={(node) => {
-                    console.log('open node:', node)
                   }}
                   onCloseNode={(node) => {
-                    console.log('close node:', node)
                   }}
                   onSelectNode={(node) => {
-                    console.log('select node:', node)
                   }}
                   onClusterWillChange={() => {
                   }}
