@@ -49,11 +49,17 @@ class App extends React.Component {
                         }, 1000);
                     }}
                   rowRenderer={(node, treeOptions) => {
-                    const { id, name, loadOnDemand = false, children, state, props = {} } = node
-
+                    const { id, loadOnDemand = false, state, props = {} } = node
+                    node.state.checkedChildren = 0
                     const droppable = treeOptions.droppable
                     const { depth, open, checked = false } = state
                     const more = node.hasChildren()
+                    let style
+                    if (checked === 'partial') {
+                      style = 'partial'
+                    } else {
+                      style = checked ? 'checked' : 'unchecked'
+                    }
 
                     return (
                       <div
@@ -77,7 +83,14 @@ class App extends React.Component {
                           {more && !open &&
                             <a className={classNames(treeOptions.togglerClass, 'infinite-tree-closed')}>►</a>
                           }
-                          <input type='checkbox' disabled checked={checked} />
+                          <input
+                            type='checkbox'
+                            checked={checked}
+                            style={{ color: 'red' }}
+                            />
+                          {
+                            style
+                          }
                           <span className='infinite-tree-title'>{props.label}</span>
                         </div>
                       </div>
@@ -97,21 +110,39 @@ class App extends React.Component {
                       }
                     }
 
-                    rootNode.state.checked = !rootNode.state.checked
+                    if (
+                        rootNode.state.checked === 'partial' ||
+                        rootNode.state.checked === false ||
+                        rootNode.state.checked === undefined
+                        ) {
+                      rootNode.state.checked = true
+                    } else {
+                      rootNode.state.checked = false
+                    }
+
                     if (more) {
                       recursiveUpdate(rootNode)
-                    } else {
-                      
                     }
+
+                    if (rootNode.state.depth !== 0) {
+                      rootNode.parent.state.checkedChildren += rootNode.state.checked ? 1 : -1
+                      if (
+                          rootNode.parent.state.checkedChildren > 0 &&
+                          rootNode.parent.state.checkedChildren < rootNode.parent.children.length) {
+                        rootNode.parent.state.checked = 'partial'
+                        this.tree.updateNode(rootNode.parent)
+                      }
+                    }
+
                     this.tree.updateNode(rootNode)
                     return true
                   }}
                   onClick={(event) => {
-                    const target = event.target || event.srcElement; // IE8
+                  //  const target = event.target || event.srcElement; // IE8
                   //  console.log('click:', target);
                   }}
                   onDoubleClick={(event) => {
-                    //console.log('double click:', target)
+                    // console.log('double click:', target)
                   }}
                   onOpenNode={(node) => {
                     console.log('open node:', node)
@@ -120,7 +151,7 @@ class App extends React.Component {
                     console.log('close node:', node)
                   }}
                   onSelectNode={(node) => {
-                    // console.log('select node:', node)
+                    console.log('select node:', node)
                   }}
                   onClusterWillChange={() => {
                   }}
