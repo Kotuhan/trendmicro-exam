@@ -49,7 +49,6 @@ class App extends React.Component {
                     { 'infinite-tree-selected': checked }
                 )}
                 data-id={id}
-                droppable={droppable}
               >
                 <div
                   className='infinite-tree-node'
@@ -79,7 +78,6 @@ class App extends React.Component {
           }}
           selectable
           shouldSelectNode={(rootNode) => {
-            // TODO: check if any of first child is partial - set parent to partial
             const more = rootNode.hasChildren()
 
             const recursiveUpdate = (node) => {
@@ -113,11 +111,19 @@ class App extends React.Component {
               let checkedChildren = 0
               let checked
 
+              const isPartial = parent.children.find((child) => {
+                return child.props.checked === 'partial'
+              })
+
               parent.children.forEach((child) => {
                 if (child.props.checked) checkedChildren++
               })
 
-              if (checkedChildren > 0 && checkedChildren < childrenLength) {
+              parent.children.find((child) => {
+                return child.props.checked === 'partial'
+              })
+
+              if (checkedChildren > 0 && checkedChildren < childrenLength || isPartial) {
                 checked = 'partial'
               } else if (checkedChildren === 0) {
                 checked = false
