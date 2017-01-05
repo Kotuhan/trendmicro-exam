@@ -5,7 +5,6 @@ import classNames from 'classnames'
 import InfiniteTree from 'react-infinite-tree'
 import 'react-infinite-tree/dist/react-infinite-tree.css'
 
-
 // <Chart />
 export const DataAnalysis = () => (
   <div className='container'>
@@ -18,174 +17,137 @@ export const DataAnalysis = () => (
 )
 
 class App extends React.Component {
-    tree = null;
+  tree = null;
 
-    componentDidMount() {
-        this.tree.loadData(data);
+  componentDidMount () {
+    this.tree.loadData(data)
+  }
+  render () {
+    return (
+      <div>
+        <InfiniteTree
+          ref={(c) => this.tree = c.tree}
+          autoOpen={false}
+          rowRenderer={(node, treeOptions) => {
+            const { id, loadOnDemand = false, state, props = {} } = node
+            const { depth, open } = state
+            const { checked = false } = props
+            const droppable = treeOptions.droppable
+            const more = node.hasChildren()
+            let style
 
-        // Select the first node
-        //this.tree.selectNode(this.tree.getChildNodes()[0]);
-    }
-    render() {
-        return (
-            <div>
-                <InfiniteTree
-                    ref={(c) => this.tree = c.tree}
-                    autoOpen={false}
-                    loadNodes={(parentNode, done) => {
-                        const suffix = parentNode.id.replace(/(\w)+/, '');
-                        const nodes = [
-                            {
-                                id: 'node1' + suffix,
-                                name: 'Node 1'
-                            },
-                            {
-                                id: 'node2' + suffix,
-                                name: 'Node 2'
-                            }
-                        ];
-                        setTimeout(() => {
-                            done(null, nodes);
-                        }, 1000);
-                    }}
-                  rowRenderer={(node, treeOptions) => {
-                    const { id, loadOnDemand = false, state, props = {} } = node
-                    const { depth, open } = state
-                    const { checked = false } = props
-                    const droppable = treeOptions.droppable
-                    const more = node.hasChildren()
-                    let style
+            if (checked === 'partial') {
+              style = 'partial'
+            } else {
+              style = checked ? 'checked' : 'unchecked'
+            }
 
-                    if (checked === 'partial') {
-                      style = 'partial'
-                    } else {
-                      style = checked ? 'checked' : 'unchecked'
-                    }
+            return (
+              <div
+                className={classNames(
+                    'infinite-tree-item',
+                    { 'infinite-tree-selected': checked }
+                )}
+                data-id={id}
+                droppable={droppable}
+              >
+                <div
+                  className='infinite-tree-node'
+                  style={{ marginLeft: depth * 18 }}
+                >
+                  {!more && loadOnDemand &&
+                    <a className={classNames(treeOptions.togglerClass, 'infinite-tree-closed')}>►</a>
+                  }
+                  {more && open &&
+                    <a className={classNames(treeOptions.togglerClass)}>▼</a>
+                  }
+                  {more && !open &&
+                    <a className={classNames(treeOptions.togglerClass, 'infinite-tree-closed')}>►</a>
+                  }
+                  <input
+                    type='checkbox'
+                    checked={checked}
+                    style={{ color: 'red' }}
+                    />
+                  {
+                    style
+                  }
+                  <span className='infinite-tree-title'>{props.label}</span>
+                </div>
+              </div>
+            )
+          }}
+          selectable
+          shouldSelectNode={(rootNode) => {
+            // TODO: check if any of first child is partial - set parent to partial
+            const more = rootNode.hasChildren()
 
-                    return (
-                      <div
-                        className={classNames(
-                            'infinite-tree-item',
-                            { 'infinite-tree-selected': checked }
-                        )}
-                        data-id={id}
-                        droppable={droppable}
-                      >
-                        <div
-                          className="infinite-tree-node"
-                          style={{ marginLeft: depth * 18 }}
-                        >
-                          {!more && loadOnDemand &&
-                            <a className={classNames(treeOptions.togglerClass, 'infinite-tree-closed')}>►</a>
-                          }
-                          {more && open &&
-                            <a className={classNames(treeOptions.togglerClass)}>▼</a>
-                          }
-                          {more && !open &&
-                            <a className={classNames(treeOptions.togglerClass, 'infinite-tree-closed')}>►</a>
-                          }
-                          <input
-                            type='checkbox'
-                            checked={checked}
-                            style={{ color: 'red' }}
-                            />
-                          {
-                            style
-                          }
-                          <span className='infinite-tree-title'>{props.label}</span>
-                        </div>
-                      </div>
-                    )
-                  }}
-                  selectable
-                  shouldSelectNode={(rootNode) => {
-                    // TODO: check if any of first child is partial - set parent to partial
-                    const more = rootNode.hasChildren()
+            const recursiveUpdate = (node) => {
+              const more = node.hasChildren()
 
-                    const recursiveUpdate = (node) => {
-                      const more = node.hasChildren()
+              node.props.checked = rootNode.props.checked
 
-                      node.props.checked = rootNode.props.checked
+              if (more) {
+                node.children.forEach(child => {
+                  recursiveUpdate(child)
+                })
+              }
+            }
 
-                      if (more) {
-                        node.children.forEach(child => {
-                          recursiveUpdate(child)
-                        })
-                      }
-                    }
+            if (
+                rootNode.props.checked === 'partial' ||
+                rootNode.props.checked === false ||
+                rootNode.props.checked === undefined
+                ) {
+              rootNode.props.checked = true
+            } else {
+              rootNode.props.checked = false
+            }
 
-                    if (
-                        rootNode.props.checked === 'partial' ||
-                        rootNode.props.checked === false ||
-                        rootNode.props.checked === undefined
-                        ) {
-                      rootNode.props.checked = true
-                    } else {
-                      rootNode.props.checked = false
-                    }
+            if (more) {
+              recursiveUpdate(rootNode)
+            }
 
-                    if (more) {
-                      recursiveUpdate(rootNode)
-                    }
+            const changeParentChecked = (parent) => {
+              const childrenLength = parent.children.length
+              let checkedChildren = 0
+              let checked
 
-                    const changeParentChecked = (parent) => {
-                      const childrenLength = parent.children.length
-                      let checkedChildren = 0
-                      let checked
+              parent.children.forEach((child) => {
+                if (child.props.checked) checkedChildren++
+              })
 
-                      parent.children.forEach((child) => {
-                        if (child.props.checked) checkedChildren++
-                      })
+              if (checkedChildren > 0 && checkedChildren < childrenLength) {
+                checked = 'partial'
+              } else if (checkedChildren === 0) {
+                checked = false
+              } else {
+                checked = true
+              }
 
-                      if (checkedChildren > 0 && checkedChildren < childrenLength) {
-                        checked = 'partial'
-                      } else if (checkedChildren === 0) {
-                        checked = false
-                      } else {
-                        checked = true
-                      }
+              return checked
+            }
 
-                      return checked
-                    }
+            const recursiveParentChange = (parent, child) => {
+              parent.props.checked = changeParentChecked(parent)
+              if (parent.state.depth !== 0) {
+                recursiveParentChange(parent.parent, parent)
+              } else {
+                this.tree.updateNode(parent)
+              }
+            }
 
-                    const recursiveParentChange = (parent, child) => {
-                      parent.props.checked = changeParentChecked(parent)
-                      if (parent.state.depth !== 0) {
-                        recursiveParentChange(parent.parent, parent)
-                      } else {
-                        this.tree.updateNode(parent)
-                      }
-                    }
-
-                    if (rootNode.state.depth !== 0) {
-                      recursiveParentChange(rootNode.parent, rootNode)
-                    } else {
-                      this.tree.updateNode(rootNode)
-                    }
-                    return false
-                  }}
-                  onClick={(event) => {
-                  }}
-                  onDoubleClick={(event) => {
-                  }}
-                  onOpenNode={(node) => {
-                  }}
-                  onCloseNode={(node) => {
-                  }}
-                  onSelectNode={(node) => {
-                  }}
-                  onClusterWillChange={() => {
-                  }}
-                  onClusterDidChange={() => {
-                  }}
-                  onContentWillUpdate={() => {
-                  }}
-                  onContentDidUpdate={() => {
-                  }}
-                />
-            </div>
-        )
-    }
+            if (rootNode.state.depth !== 0) {
+              recursiveParentChange(rootNode.parent, rootNode)
+            } else {
+              this.tree.updateNode(rootNode)
+            }
+            return false
+          }}
+        />
+      </div>
+    )
+  }
 }
 
 DataAnalysis.propTypes = {
