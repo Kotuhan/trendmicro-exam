@@ -50,10 +50,12 @@ class App extends React.Component {
                     }}
                   rowRenderer={(node, treeOptions) => {
                     const { id, loadOnDemand = false, state, props = {} } = node
+                    const { depth, open } = state
+                    const { checked = false } = props
                     const droppable = treeOptions.droppable
-                    const { depth, open, checked = false } = state
                     const more = node.hasChildren()
                     let style
+
                     if (checked === 'partial') {
                       style = 'partial'
                     } else {
@@ -103,7 +105,7 @@ class App extends React.Component {
                     const recursiveUpdate = (node) => {
                       const more = node.hasChildren()
 
-                      node.state.checked = rootNode.state.checked
+                      node.props.checked = rootNode.props.checked
 
                       if (more) {
                         node.children.forEach(child => {
@@ -113,13 +115,13 @@ class App extends React.Component {
                     }
 
                     if (
-                        rootNode.state.checked === 'partial' ||
-                        rootNode.state.checked === false ||
-                        rootNode.state.checked === undefined
+                        rootNode.props.checked === 'partial' ||
+                        rootNode.props.checked === false ||
+                        rootNode.props.checked === undefined
                         ) {
-                      rootNode.state.checked = true
+                      rootNode.props.checked = true
                     } else {
-                      rootNode.state.checked = false
+                      rootNode.props.checked = false
                     }
 
                     if (more) {
@@ -132,7 +134,7 @@ class App extends React.Component {
                       let checked
 
                       parent.children.forEach((child) => {
-                        if (child.state.checked) checkedChildren++
+                        if (child.props.checked) checkedChildren++
                       })
 
                       if (checkedChildren > 0 && checkedChildren < childrenLength) {
@@ -147,7 +149,7 @@ class App extends React.Component {
                     }
 
                     const recursiveParentChange = (parent, child) => {
-                      parent.state.checked = changeParentChecked(parent)
+                      parent.props.checked = changeParentChecked(parent)
                       if (parent.state.depth !== 0) {
                         recursiveParentChange(parent.parent, parent)
                       } else {
